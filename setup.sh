@@ -17,5 +17,15 @@ function check_requirements {
   fi
 }
 
+function first_time_setup {
+  :
+}
+
 # Run function to check requirements
 check_requirements
+
+# If not running in GH Actions, run function for first time setup
+if [[ "$GITHUB_ACTIONS" != "true" ]]; then
+  echo "Not inside GitHub Actions, running first time setup"
+  first_time_setup
+fi
