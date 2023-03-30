@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 source setup.inc.sh
 
+# Check if required binaries are present/in the PATH variable
 function check_requirements {
   echo "Checking existence of required binaries: $REQUIREMENTS"
   NOTFOUND=false
@@ -17,8 +18,42 @@ function check_requirements {
   fi
 }
 
+# Create a Service Principal to be used by GH Actions or similar CI solutions
+# First we check for existence of CI/CD secrets file and skip if found
+function create_service_principal {
+  echo "Checking if previous CI/CD secrets file exists"
+
+  if [[ -f "$CI_CD_SECRETS_FILE" ]]; then
+    echo "Found file "$CI_CD_SECRETS_FILE", skipping creation of Service Principal"
+  else
+    echo "No previous CI/CD secrets file found"
+    echo "Retrieving Subscription ID"
+    AZ_SUB=$(az account show --query id --output tsv)
+    echo "Creating Service Principal for CI/CD"
+    AZ_AD_SP_OUTPUT=$(az ad sp create-for-rbac \
+      --name "$PROJECT_NAME-sp" \
+      --role contributor \
+      --scopes /subscriptions/$AZ_SUB \
+      --sdk-auth \
+    )
+
+    if [[ $? -eq 0 ]]; then
+      echo "Service Principal for CI/CD created successfully"
+      echo "Saving Service Principal authentication details as $CI_CD_SECRETS_FILE"
+      echo "$AZ_AD_SP_OUTPUT" > $CI_CD_SECRETS_FILE
+      echo "JSON file saved successfully. You may copy the contents into a secret in your CI solution"
+    else
+      echo "Error creating Service Principal for CI/CD"
+      exit 2
+    fi
+  fi
+}
+
+# First time setup
+# It should not run inside GH Actions nor similar CI solutions
+# Even when running locally, it should be idempotent
 function first_time_setup {
-  :
+  create_service_principal
 }
 
 # Run function to check requirements
