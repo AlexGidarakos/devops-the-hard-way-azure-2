@@ -4,9 +4,6 @@ PROJECT_PREFIX="alexg"
 PROJECT_REGION="uksouth"
 
 # If running in GH Actions, append "gh" to project prefix
-Check if running within a GitHub Actions runner
-# Based on https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
-# If true, prepend a "gh" string to the project prefix
 if [[ "$GITHUB_ACTIONS" == "true" ]]; then
   PROJECT_PREFIX="${PROJECT_PREFIX}-gh"
 fi
