@@ -75,6 +75,19 @@ function create_tfstate_sa {
   fi
 }
 
+# Create Storage Container for the Terraform state file
+function create_tfstate_sc {
+  echo "Creating Terraform state Storage Container $TFSTATE_STORAGE_CONTAINER"
+  az storage container create --name $TFSTATE_STORAGE_CONTAINER --account-name $TFSTATE_STORAGE_ACCOUNT
+
+  if [[ $? -eq 0 ]]; then
+    echo "Storage Container created successfully"
+  else
+    echo "Error creating Storage Container"
+    exit 5
+  fi
+}
+
 # First time setup
 # It should not run inside GH Actions nor similar CI solutions
 # Even when running locally, it should be idempotent
@@ -82,6 +95,7 @@ function first_time_setup {
   create_service_principal
   create_tfstate_storage_rg
   create_tfstate_sa
+  create_tfstate_sc
 }
 
 # Run function to check requirements

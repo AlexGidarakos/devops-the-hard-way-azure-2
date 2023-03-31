@@ -9,13 +9,13 @@ if [[ "$GITHUB_ACTIONS" == "true" ]]; then
 fi
 
 REQUIREMENTS="az terraform docker kubelogin kubectl"
-STORAGE_CONTAINER="tfstate"
-TFSTATE_FILE="terraform.tfstate"
 PROJECT_NAME="${PROJECT_PREFIX}-${PROJECT_BASENAME}"
 CI_CD_SECRETS_FILE="cicd-auth.gitignore.json"
 AKS_AAD_GROUP="${PROJECT_NAME}-aks-group"
 MAIN_RG="${PROJECT_NAME}-rg"
 TFSTATE_STORAGE_RG="${PROJECT_NAME}-rg-tfstate"
+TFSTATE_STORAGE_CONTAINER="${PROJECT_NAME}-tf"
+TFSTATE_FILE="${PROJECT_NAME}.tfstate"
 
 # Following var value MUST be max 24 chars and include only lowercase letters and numbers
 TFSTATE_STORAGE_ACCOUNT=$(echo "${PROJECT_NAME}-tf" | tr -d "-")
