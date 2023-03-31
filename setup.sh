@@ -88,6 +88,19 @@ function create_tfstate_sc {
   fi
 }
 
+# Create Azure AD Group for AKS admins
+function create_aks_aad_group {
+  echo "Creating AKS Admins Azure AD Group $AKS_AAD_GROUP"
+  az ad group create --display-name $AKS_AAD_GROUP --mail-nickname $AKS_AAD_GROUP
+
+  if [[ $? -eq 0 ]]; then
+    echo "Group created successfully"
+  else
+    echo "Error creating group"
+    exit 6
+  fi
+}
+
 # First time setup
 # It should not run inside GH Actions nor similar CI solutions
 # Even when running locally, it should be idempotent
@@ -96,6 +109,7 @@ function first_time_setup {
   create_tfstate_storage_rg
   create_tfstate_sa
   create_tfstate_sc
+  create_aks_aad_group
 }
 
 # Run function to check requirements
