@@ -38,3 +38,9 @@ jobs:
 
       - name: Check Terraform version
         run: terraform version
+
+      - name: terraform format
+        run: terraform fmt
+
+      - name: terraform init
+        run: terraform init
