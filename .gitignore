@@ -41,3 +41,6 @@ override.tf.json
 # Add custom string suffix to files or directories to ignore
 *-gitignore*
 *.gitignore.*
+
+# Ignore files that are generated from their template version during first time setup
+providers.tf

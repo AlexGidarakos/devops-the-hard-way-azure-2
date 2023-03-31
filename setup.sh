@@ -194,20 +194,20 @@ function build_docker_image {
   fi
 }
 
-# Replace placeholder values in Terraform and YAML files
-function replace_placeholders {
+# Generate some Terraform and YAML files from their templates
+function generate_from_templates {
   SED_FAILED=false
-  echo "Replacing placeholder values in providers.tf"
-  sed -i.gitignore.orig "s/TFSTATE_STORAGE_RG/$TFSTATE_STORAGE_RG/" providers.tf || SED_FAILED=true
-  sed -i.gitignore.orig "s/TFSTATE_STORAGE_ACCOUNT/$TFSTATE_STORAGE_ACCOUNT/" providers.tf || SED_FAILED=true
-  sed -i.gitignore.orig "s/TFSTATE_STORAGE_CONTAINER/$TFSTATE_STORAGE_CONTAINER/" providers.tf || SED_FAILED=true
-  sed -i.gitignore.orig "s/TFSTATE_FILE/$TFSTATE_FILE/" providers.tf || SED_FAILED=true
+  echo "Processing providers.tf.template"
+  sed -e "s/TFSTATE_STORAGE_RG/$TFSTATE_STORAGE_RG/g" \
+      -e "s/TFSTATE_STORAGE_ACCOUNT/$TFSTATE_STORAGE_ACCOUNT/g" \
+      -e "s/TFSTATE_STORAGE_CONTAINER/$TFSTATE_STORAGE_CONTAINER/g" \
+      -e "s/TFSTATE_FILE/$TFSTATE_FILE/g" \
+      providers.tf.template > providers.tf || SED_FAILED=true
 
   if [[ "$SED_FAILED" != "true" ]]; then
-    echo "Placeholder values replaced successfully in providers.tf"
-    echo "Original saved as providers.tf.gitignore.orig"
+    echo "Providers.tf created successfully from template"
   else
-    echo "Error replacing placeholder values in providers.tf"
+    echo "Error generating providers.tf from template"
     exit 13
   fi
 }
@@ -226,5 +226,5 @@ fi
 # Build Docker image to push to the ACR later
 build_docker_image
 
-# Replace placeholder values in Terraform and YAML files
-replace_placeholders
+# Generate some Terraform and YAML files from their templates
+generate_from_templates
