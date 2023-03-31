@@ -181,6 +181,19 @@ function first_time_setup {
   aks_aad_group_add_users
 }
 
+# Build Docker image to push to the ACR later
+function build_docker_image {
+  echo "Building Docker image that will be pushed to the ACR"
+  docker build --platform=linux/amd64 -t uberapp Docker
+
+  if [[ $? -eq 0 ]]; then
+    echo "Docker image built successfully"
+  else
+    echo "Error building Docker image"
+    exit 12
+  fi
+}
+
 # Run function to check requirements
 check_requirements
 
@@ -189,3 +202,6 @@ if [[ "$GITHUB_ACTIONS" != "true" ]]; then
   echo "Not inside GitHub Actions, running first time setup"
   first_time_setup
 fi
+
+# Build Docker image to push to the ACR later
+build_docker_image
