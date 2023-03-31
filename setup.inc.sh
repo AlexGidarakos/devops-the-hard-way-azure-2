@@ -4,9 +4,9 @@ PROJECT_PREFIX="alexg"
 PROJECT_REGION="uksouth"
 
 # If running in GH Actions, append "gh" to project prefix
-if [[ "$GITHUB_ACTIONS" == "true" ]]; then
-  PROJECT_PREFIX="${PROJECT_PREFIX}-gh"
-fi
+#if [[ "$GITHUB_ACTIONS" == "true" ]]; then
+#  PROJECT_PREFIX="${PROJECT_PREFIX}-gh"
+#fi
 
 REQUIREMENTS="az terraform docker kubelogin kubectl"
 PROJECT_NAME="${PROJECT_PREFIX}-${PROJECT_BASENAME}"
