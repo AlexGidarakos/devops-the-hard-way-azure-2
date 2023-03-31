@@ -44,11 +44,15 @@ jobs:
           echo "ARM_SUBSCRIPTION_ID=$(echo $AZ_CREDS | jq -r '.subscriptionId')" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo $AZ_CREDS | jq -r '.tenantId')" >> $GITHUB_ENV
 
-      - name: Check Terraform version
-        run: "terraform version"
-
-      - name: terraform format
+      - name: Terraform format
         run: terraform fmt
 
-      - name: terraform init
+      - name: Terraform init
         run: terraform init
+
+      - name: Terraform plan
+        run: terraform apply -out terraform.tfplan
+
+      - name: Terraform apply
+        if: github.ref == 'refs/heads/master'
+        run: terraform apply terraform.tfplan
