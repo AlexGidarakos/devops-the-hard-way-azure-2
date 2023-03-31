@@ -37,6 +37,9 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Terraform format
+        run: terraform fmt
+
       - name: Set env variables for Terraform Azure authentication
         run: |
           echo "ARM_CLIENT_ID=$(echo $AZ_CREDS | jq -r '.clientId')" >> $GITHUB_ENV
@@ -44,14 +47,10 @@ jobs:
           echo "ARM_SUBSCRIPTION_ID=$(echo $AZ_CREDS | jq -r '.subscriptionId')" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo $AZ_CREDS | jq -r '.tenantId')" >> $GITHUB_ENV
 
-      - name: Terraform format
-        run: terraform fmt
-
-      - name: Terraform init
-        run: terraform init
-
-      - name: Terraform plan
-        run: terraform plan -out terraform.tfplan
+      - name: Terraform init and plan
+        run: |
+          terraform init
+          terraform plan -out terraform.tfplan
 
       - name: Terraform apply
         if: github.ref == 'refs/heads/master'
