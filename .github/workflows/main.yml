@@ -41,8 +41,7 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Check Terraform version
-        run: terraform version
-        run: echo $ARM_TENANT_ID
+        run: "terraform version; echo $ARM_TENANT_ID"
 
       #- name: terraform format
       #  run: terraform fmt
