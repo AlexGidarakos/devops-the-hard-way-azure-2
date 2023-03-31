@@ -196,20 +196,16 @@ function build_docker_image {
 
 # Replace placeholder values in Terraform and YAML files
 function replace_placeholders {
-  # The FreeBSD version of sed needs a blank string passed as a value to the -i argument
-  if [[ "$OSTYPE" == "darwin"* ]] || [[ "$OSTYPE" == "freebsd"* ]]; then
-    SED_BSD="\"\""
-  fi
-
   SED_FAILED=false
   echo "Replacing placeholder values in providers.tf"
-  sed -i $SED_BSD "s/TFSTATE_STORAGE_RG/$TFSTATE_STORAGE_RG/" providers.tf || SED_FAILED=true
-  sed -i $SED_BSD "s/TFSTATE_STORAGE_ACCOUNT/$TFSTATE_STORAGE_ACCOUNT/" providers.tf || SED_FAILED=true
-  sed -i $SED_BSD "s/TFSTATE_STORAGE_CONTAINER/$TFSTATE_STORAGE_CONTAINER/" providers.tf || SED_FAILED=true
-  sed -i $SED_BSD "s/TFSTATE_FILE/$TFSTATE_FILE/" providers.tf || SED_FAILED=true
+  sed -i.gitignore.orig "s/TFSTATE_STORAGE_RG/$TFSTATE_STORAGE_RG/" providers.tf || SED_FAILED=true
+  sed -i.gitignore.orig "s/TFSTATE_STORAGE_ACCOUNT/$TFSTATE_STORAGE_ACCOUNT/" providers.tf || SED_FAILED=true
+  sed -i.gitignore.orig "s/TFSTATE_STORAGE_CONTAINER/$TFSTATE_STORAGE_CONTAINER/" providers.tf || SED_FAILED=true
+  sed -i.gitignore.orig "s/TFSTATE_FILE/$TFSTATE_FILE/" providers.tf || SED_FAILED=true
 
   if [[ "$SED_FAILED" != "true" ]]; then
     echo "Placeholder values replaced successfully in providers.tf"
+    echo "Original saved as providers.tf.gitignore.orig"
   else
     echo "Error replacing placeholder values in providers.tf"
     exit 13
