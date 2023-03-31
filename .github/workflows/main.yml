@@ -44,8 +44,8 @@ jobs:
         run: terraform version
         run: echo $ARM_TENANT_ID
 
-      - name: terraform format
-        run: terraform fmt
+      #- name: terraform format
+      #  run: terraform fmt
 
-      - name: terraform init
-        run: terraform init
+      #- name: terraform init
+      #  run: terraform init
