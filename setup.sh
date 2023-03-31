@@ -194,10 +194,34 @@ function build_docker_image {
   fi
 }
 
-# Run function to check requirements
+# Replace placeholder values in Terraform and YAML files
+function replace_placeholders {
+  # The FreeBSD version of sed needs a blank string passed as a value to the -i argument
+  if [[ "$OSTYPE" == "darwin"* ]] || [[ "$OSTYPE" == "freebsd"* ]]; then
+    SED_BSD="\"\""
+  fi
+
+  SED_FAILED=false
+  echo "Replacing placeholder values in providers.tf"
+  sed -i $SED_BSD "s/TFSTATE_STORAGE_RG/$TFSTATE_STORAGE_RG/" providers.tf || SED_FAILED=true
+  sed -i $SED_BSD "s/TFSTATE_STORAGE_ACCOUNT/$TFSTATE_STORAGE_ACCOUNT/" providers.tf || SED_FAILED=true
+  sed -i $SED_BSD "s/TFSTATE_STORAGE_CONTAINER/$TFSTATE_STORAGE_CONTAINER/" providers.tf || SED_FAILED=true
+  sed -i $SED_BSD "s/TFSTATE_FILE/$TFSTATE_FILE/" providers.tf || SED_FAILED=true
+
+  if [[ "$SED_FAILED" != "true" ]]; then
+    echo "Placeholder values replaced successfully in providers.tf"
+  else
+    echo "Error replacing placeholder values in providers.tf"
+    exit 13
+  fi
+}
+
+# Check if required binaries are present/in the PATH variable
 check_requirements
 
-# If not running in GH Actions, run function for first time setup
+# First time setup
+# It should not run inside GH Actions nor similar CI solutions
+# Even when running locally, it should be IDEMPOTENT
 if [[ "$GITHUB_ACTIONS" != "true" ]]; then
   echo "Not inside GitHub Actions, running first time setup"
   first_time_setup
@@ -205,3 +229,6 @@ fi
 
 # Build Docker image to push to the ACR later
 build_docker_image
+
+# Replace placeholder values in Terraform and YAML files
+replace_placeholders
