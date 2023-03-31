@@ -34,7 +34,7 @@ jobs:
       - name: Setup Terraform Action
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_vesion: ${{ env.TF_VERSION }}
+          terraform_version: ${{ env.TF_VERSION }}
 
       - name: Check Terraform version
         run: terraform version
