@@ -41,7 +41,8 @@ function create_service_principal {
       echo "Service Principal for CI/CD created successfully"
       echo "Saving Service Principal authentication details as $CI_CD_SECRETS_FILE"
       echo "$AZ_AD_SP_OUTPUT" > $CI_CD_SECRETS_FILE
-      echo "JSON file saved successfully. You may copy the contents into a secret in your CI solution"
+      echo "JSON file saved successfully"
+      echo "You may copy the contents into a secret in your CI solution"
     else
       echo "Error creating Service Principal for CI/CD"
       exit 2
@@ -101,6 +102,73 @@ function create_aks_aad_group {
   fi
 }
 
+# Add current az login user and service principal to AKS AAD Group
+function aks_aad_group_add_users {
+  echo "Retrieving az login user ID"
+  AZ_LOGIN_USER_ID=$(az ad signed-in-user show --query id -o tsv)
+
+  if [[ $? -eq 0 ]]; then
+    echo "User ID $AZ_LOGIN_USER_ID retrieved successfully"
+  else
+    echo "Error retrieving user ID"
+    exit 7
+  fi
+
+  echo "Retrieving ID of group $AKS_AAD_GROUP"
+  AKS_AAD_GROUP_ID=$(az ad group show --group "$AKS_AAD_GROUP" --query id -o tsv)
+
+  if [[ $? -eq 0 ]]; then
+    echo "Group ID $AKS_AAD_GROUP_ID retrieved successfully"
+  else
+    echo "Error retrieving group ID"
+    exit 8
+  fi
+
+  echo "Checking if az login user $AZ_LOGIN_USER_ID is already a group member"
+  az ad group member check --group $AKS_AAD_GROUP --member-id $AZ_LOGIN_USER_ID | grep "true"
+
+  if [[ $? -eq 0 ]]; then
+    echo "User already a group member"
+  else
+    echo "User not a group member, adding"
+    az ad group member add --group $AKS_AAD_GROUP --member-id $AZ_LOGIN_USER_ID
+
+    if [[ $? -eq 0 ]]; then
+      echo "User added successfully to group"
+    else
+      echo "Error adding user to group"
+      exit 9
+    fi
+  fi
+
+  echo "Retrieving Service Principal ID"
+  AZ_SP_ID=$(az ad sp list --display-name "$PROJECT_NAME-sp" --query "[0].id" -o tsv)
+
+  if [[ $? -eq 0 ]]; then
+    echo "Service Principal ID $AZ_SP_ID retrieved successfully"
+  else
+    echo "Error retrieving Service Principal ID"
+    exit 10
+  fi
+
+  echo "Checking if Service Principal already a group member"
+  az ad group member check --group $AKS_AAD_GROUP --member-id $AZ_SP_ID | grep "true"
+
+  if [[ $? -eq 0 ]]; then
+    echo "Service Principal already a group member"
+  else
+    echo "Service Principal not a group member, adding"
+    az ad group member add --group $AKS_AAD_GROUP --member-id $AZ_SP_ID
+
+    if [[ $? -eq 0 ]]; then
+      echo "Service Principal added successfully to group"
+    else
+      echo "Error adding Service Principal to group"
+      exit 11
+    fi
+  fi
+}
+
 # First time setup
 # It should not run inside GH Actions nor similar CI solutions
 # Even when running locally, it should be idempotent
@@ -110,6 +178,7 @@ function first_time_setup {
   create_tfstate_sa
   create_tfstate_sc
   create_aks_aad_group
+  aks_aad_group_add_users
 }
 
 # Run function to check requirements
