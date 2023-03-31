@@ -49,11 +49,25 @@ function create_service_principal {
   fi
 }
 
+# Create Resource Group for the Terraform state storage
+function create_tfstate_storage_rg {
+  echo "Creating Resource Group $TFSTATE_STORAGE_RG in region $PROJECT_REGION"
+  az group create -l $PROJECT_REGION -n $TFSTATE_STORAGE_RG
+
+  if [[ $? -eq 0 ]]; then
+    echo "Resource Group created successfully"
+  else
+    echo "Error creating Resource Group"
+  exit 3
+  fi
+}
+
 # First time setup
 # It should not run inside GH Actions nor similar CI solutions
 # Even when running locally, it should be idempotent
 function first_time_setup {
   create_service_principal
+  create_tfstate_storage_rg
 }
 
 # Run function to check requirements
