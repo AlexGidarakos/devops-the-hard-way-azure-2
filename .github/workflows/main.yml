@@ -39,21 +39,16 @@ jobs:
 
       - name: Set env variables for Terraform Azure authentication
         run: |
-          echo $AZ_CREDS
-          echo "$AZ_CREDS"
           echo "ARM_CLIENT_ID=$(echo $AZ_CREDS | jq -r '.clientId')" >> $GITHUB_ENV
           echo "ARM_CLIENT_SECRET=$(echo $AZ_CREDS | jq -r '.clientSecret')" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=$(echo $AZ_CREDS | jq -r '.subscriptionId')" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo $AZ_CREDS | jq -r '.tenantId')" >> $GITHUB_ENV
 
-      - name: Test env variables for Terraform Azure authentication
-        run: echo "ARM_CLIENT_ID=$ARM_CLIENT_ID"
+      - name: Check Terraform version
+        run: "terraform version"
 
-      #- name: Check Terraform version
-      #  run: "terraform version"
+      - name: terraform format
+        run: terraform fmt
 
-      #- name: terraform format
-      #  run: terraform fmt
-
-      #- name: terraform init
-      #  run: terraform init
+      - name: terraform init
+        run: terraform init
