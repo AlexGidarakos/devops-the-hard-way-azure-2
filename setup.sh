@@ -62,12 +62,26 @@ function create_tfstate_storage_rg {
   fi
 }
 
+# Create Storage Account for the Terraform state file
+function create_tfstate_sa {
+  echo "Creating Terraform state Storage Account $TFSTATE_STORAGE_ACCOUNT"
+  az storage account create -n $TFSTATE_STORAGE_ACCOUNT -g $TFSTATE_STORAGE_RG -l $PROJECT_REGION --sku Standard_LRS
+
+  if [[ $? -eq 0 ]]; then
+    echo "Storage Account created successfully"
+  else
+    echo "Error creating Storage Account"
+    exit 4
+  fi
+}
+
 # First time setup
 # It should not run inside GH Actions nor similar CI solutions
 # Even when running locally, it should be idempotent
 function first_time_setup {
   create_service_principal
   create_tfstate_storage_rg
+  create_tfstate_sa
 }
 
 # Run function to check requirements
