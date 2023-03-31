@@ -40,3 +40,4 @@ override.tf.json
 
 # Add custom string suffix to files or directories to ignore
 *-gitignore*
+*.gitignore.*
