@@ -32,6 +32,12 @@ override.tf.json
 # Lock file
 .terraform.lock.hcl
 
+# Certificates
+*.key
+*.pub
+*.pem
+*.crt
+
 # AWS Access Keys CSV
 *accessKeys.csv*
 

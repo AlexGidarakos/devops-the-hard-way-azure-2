@@ -22,9 +22,7 @@ jobs:
           creds: ${{ secrets.AZ_CREDS }}
 
       - name: Install kubelogin
-        run: |
-          #sudo apt-get update
-          sudo snap install kubelogin
+        run: sudo snap install kubelogin
 
       - name: Checkout
         uses: actions/checkout@v3
